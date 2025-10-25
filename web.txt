@@ -1,0 +1,210 @@
+my-shop/
+│
+├── index.html
+├── style.css
+├── script.js
+├── products.json
+└── images/
+      └── product1.jpg
+      └── product2.jpg
+[
+    {
+        "id": 1,
+        "name": "Product 1",
+        "price": 20,
+        "image": "images/product1.jpg"
+    },
+    {
+        "id": 2,
+        "name": "Product 2",
+        "price": 35,
+        "image": "images/product2.jpg"
+    }
+]
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Online Shop</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+    <header>
+        <h1>My Shop</h1>
+        <nav>
+            <a href="#products">Products</a>
+            <a href="#cart">Cart</a>
+        </nav>
+    </header>
+
+    <section id="products">
+        <h2>Our Products</h2>
+        <div class="product-container" id="product-container">
+            <!-- Products loaded dynamically -->
+        </div>
+    </section>
+
+    <section id="cart">
+        <h2>Your Cart</h2>
+        <ul id="cart-items"></ul>
+        <p>Total: $<span id="total">0</span></p>
+        <button id="checkout-btn">Checkout</button>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #007BFF;
+    color: white;
+    padding: 1rem;
+    text-align: center;
+}
+
+nav a {
+    color: white;
+    margin: 0 10px;
+    text-decoration: none;
+}
+
+.product-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 1rem;
+}
+
+.product {
+    border: 1px solid #ddd;
+    margin: 10px;
+    padding: 10px;
+    width: 200px;
+    text-align: center;
+}
+
+.product img {
+    width: 100%;
+    height: auto;
+}
+
+button {
+    background-color: #28a745;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #218838;
+}
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #007BFF;
+    color: white;
+    padding: 1rem;
+    text-align: center;
+}
+
+nav a {
+    color: white;
+    margin: 0 10px;
+    text-decoration: none;
+}
+
+.product-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 1rem;
+}
+
+.product {
+    border: 1px solid #ddd;
+    margin: 10px;
+    padding: 10px;
+    width: 200px;
+    text-align: center;
+}
+
+.product img {
+    width: 100%;
+    height: auto;
+}
+
+button {
+    background-color: #28a745;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #218838;
+}
+let cart = [];
+let total = 0;
+const productContainer = document.getElementById('product-container');
+
+fetch('products.json')
+    .then(res => res.json())
+    .then(products => {
+        products.forEach(product => {
+            const div = document.createElement('div');
+            div.classList.add('product');
+            div.innerHTML = `
+                <img src="${product.image}" alt="${product.name}">
+                <h3>${product.name}</h3>
+                <p>Price: $${product.price}</p>
+                <button onclick="addToCart(${product.id}, '${product.name}', ${product.price})">Buy Now</button>
+            `;
+            productContainer.appendChild(div);
+        });
+    });
+
+function addToCart(id, name, price) {
+    cart.push({ id, name, price });
+    total += price;
+    updateCart();
+}
+
+function updateCart() {
+    const cartItems = document.getElementById('cart-items');
+    cartItems.innerHTML = '';
+    cart.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = `${item.name} - $${item.price}`;
+        cartItems.appendChild(li);
+    });
+    document.getElementById('total').textContent = total;
+}
+
+// Stripe Checkout (test mode)
+const stripe = Stripe('pk_test_1234567890abcdef'); // replace with your Stripe test public key
+
+document.getElementById('checkout-btn').addEventListener('click', () => {
+    if (cart.length === 0) {
+        alert('Cart is empty!');
+        return;
+    }
+
+    // Normally, create a payment session on backend
+    alert(`Test Checkout - Total: $${total}\n(This is a demo. Implement backend for real payments.)`);
+    cart = [];
+    total = 0;
+    updateCart();
+});
